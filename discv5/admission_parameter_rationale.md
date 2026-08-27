@@ -41,8 +41,6 @@ In the target-topic experiments, 50% of honest registrations use the target topi
 
 In a whole-cache occupation attack, the attacker spreads registrations over many (random) topics. The objective is to consume registrar ad cache capacity. Imposing IP diversity makes this attack more difficult (i.e., costly), as advertisers must register ads from diverse IP addresses. 
 
-[//]: # (In the cache-occupation experiments, the attacker chooses from 3000 attacker-controlled topics.)
-
 ## 3. Evaluation questions
 
 The evaluation is organised around five questions. Each question is associated with a specific parameter or mechanism component.
@@ -240,7 +238,6 @@ This similarity is due to how the implemented IP score is computed. The simulato
 For a genuinely diverse attacker, the IP score no longer provides the same protection: attacker share is approximately 80% even with IP scoring enabled. 
 
 The cost imposed on concentrated attackers is also visible in attempts per admission. Under the `/24` attack, enabling IP scoring increases attacker attempts per admission from about 14 to about 85. This indicates that the IP-diversity term does not merely reduce cache share; it also changes the cost curve faced by the attacker. Concentrated attackers can still obtain admissions, but they must make substantially more attempts per successful admission.
-
 
 ## 8. Q4: Cost of topic similarity for popular honest topics
 
