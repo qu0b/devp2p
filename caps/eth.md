@@ -557,6 +557,7 @@ the local pool. The items in the list are transactions in the format described i
 Ethereum specification.
 
 For blob transactions (type 3), the blob data is elided from the response.
+
 <!-- TODO: define encoding in tx section -->
 
 The transactions must be in same order as in the request, but it is OK to skip
@@ -863,8 +864,8 @@ Version numbers below 60 were used during the Ethereum PoC development phase.
 [EIP-8070]: https://eips.ethereum.org/EIPS/eip-8070
 [EIP-8159]: https://eips.ethereum.org/EIPS/eip-8159
 [The Merge]: https://eips.ethereum.org/EIPS/eip-3675
-[London hard fork]: https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/london.md
-[Shanghai fork]: https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/shanghai.md
-[Cancun fork]: https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/cancun.md
-[Amsterdam fork]: https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/amsterdam.md
+[London hard fork]: https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/london.md
+[Shanghai fork]: https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/shanghai.md
+[Cancun fork]: https://github.com/ethereum/execution-specs/blob/8dbde99b132ff8d8fcc9cfb015a9947ccc8b12d6/network-upgrades/mainnet-upgrades/cancun.md
+[Amsterdam fork]: https://eips.ethereum.org/EIPS/eip-7773
 [Yellow Paper]: https://ethereum.github.io/yellowpaper/paper.pdf
