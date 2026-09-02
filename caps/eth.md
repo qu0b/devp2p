@@ -200,15 +200,15 @@ transaction type (`tx-type`) and the remaining bytes are opaque type-specific da
 
 #### Pooled Encoding
 
-Certain transaction types carry auxiliary data which is required to validate the
-transaction in the pool, but which is not part of the transaction as it appears in a
-block. Transactions of such a type therefore have a second, 'pooled' encoding, used by
-[PooledTransactions]. In definitions across this specification, we refer to transactions
-in this encoding using the identifier `pooled-txₙ`.
+Certain transactions carry auxiliary data which is required to validate the transaction
+in the pool, but which is not part of the transaction as it appears in a block. Such a
+transaction therefore has a second, 'pooled' encoding for exchange together with its
+auxiliary data. This encoding is defined independently of the protocol messages that use
+it. In definitions across this specification, we refer to transactions in this encoding
+using the identifier `pooled-txₙ`.
 
-For a transaction whose `tx-type` defines no wrapped form, the pooled encoding is
-identical to `tx`. Types which do define one — currently only type `0x03`, introduced by
-[EIP-4844] — are encoded as:
+The pooled encoding is identical to `tx` when a transaction has no auxiliary data in a
+wrapped form. A transaction with wrapped auxiliary data is encoded as:
 
     wrapped-tx = tx-type || rlp([
         tx-payload-body,
@@ -225,10 +225,9 @@ for which `proofs` contains `CELLS_PER_EXT_BLOB` cell proofs per blob. On chains
 omits the `wrapper-version` element and carries one blob proof per blob. The two forms are
 distinguished by the number of elements in the RLP list.
 
-The `blobs` element is the empty list in [PooledTransactions] responses from `eth/72`
-onwards; blob data is obtained through [GetCells] instead. See [EIP-8070]. Note that the
-resulting encoding still contains the `wrapper-version` element and an empty `blobs` list,
-so its length is not simply the length of the blob data subtracted from the unelided form.
+Whether a transaction uses the wrapped form is defined by its transaction type and may
+depend on the transaction's contents. Type `0x03`, introduced by [EIP-4844], always uses
+the wrapped form in its pooled encoding.
 
 Transactions must be validated when they are received. Validity depends on the Ethereum
 chain state. The specific kind of validity this specification is concerned with is not
@@ -495,8 +494,9 @@ relay transactions to a peer they received that transaction from. In practice th
 often implemented by keeping a per-peer bloom filter or set of transaction hashes which
 have already been sent or received.
 
-Transactions of a type which defines a wrapped [pooled encoding] must not be sent in this
-message. Per [EIP-4844], such transactions are only ever announced with
+Whether a typed transaction may be sent in this message is defined by the EIP introducing
+its type and may depend on the transaction's contents. Per [EIP-4844], type `0x03`
+transactions must not be sent in this message; they are announced with
 [NewPooledTransactionHashes] and served on request via [GetPooledTransactions].
 
 ### GetBlockHeaders (0x03)
@@ -558,12 +558,14 @@ The `txtypes` element is a byte array containing the announced [transaction type
 other two payload elements refer to the sizes and hashes of the announced transactions.
 All three payload elements must contain an equal number of items.
 
-`txsizeₙ` is the byte length of the announced transaction in the [pooled encoding], on the
-protocol version negotiated for this connection. It is the length of:
+`txsizeₙ` is the byte length of the transaction representation that the announcing peer
+would return in [PooledTransactions], on the protocol version negotiated for this
+connection. It is the length of:
 
 - the RLP encoding of `legacy-tx`, for legacy transactions;
-- `tx-type || tx-data`, for typed transactions whose type defines no wrapped form;
-- the whole `wrapped-tx`, for types which do.
+- `tx-type || tx-data`, for typed transactions whose pooled encoding does not use the
+  wrapped form;
+- the whole `wrapped-tx`, for transactions whose pooled encoding uses the wrapped form.
 
 The RLP string header which frames a typed transaction as an element of the enclosing
 [PooledTransactions] list is not counted.
@@ -580,9 +582,9 @@ element signals that availability instead.
 
 The `cells` element is a bitmap marking which cell indices can be fetched from the sending
 peer. For each bit set to one, the peer stores the cells at that index in every blob of
-all blob transactions included in the announcement. `cells` is only relevant for those
-entries that refer to blob transactions, and can be ignored when no blob transactions are
-announced in the message.
+all blob-carrying transactions included in the announcement. `cells` is only relevant for
+entries that refer to transactions carrying one or more blobs, and can be ignored when no
+such transactions are announced in the message.
 
 The recommended soft limit for this message is 4096 items (~150 KiB).
 
@@ -607,6 +609,11 @@ must not be considered a protocol violation.
 
 This is the response to GetPooledTransactions, returning the requested transactions from
 the local pool, in the [pooled encoding].
+
+The `blobs` element of a `wrapped-tx` is the empty list in responses from `eth/72` onwards;
+blob data is obtained through [GetCells] instead. See [EIP-8070]. Note that the resulting
+encoding still contains the `wrapper-version` element and an empty `blobs` list, so its
+length is not simply the length of the blob data subtracted from the unelided form.
 
 The transactions must be in same order as in the request, but it is OK to skip
 transactions which are not available. This way, if the response size limit is reached,
